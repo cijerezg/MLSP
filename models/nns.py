@@ -144,10 +144,7 @@ class SkillPrior(nn.Module):
     def forward(self, obs):
         x = self.embed_obs(obs[:, :self.input_obs])
         if self.input_l is not None:
-            try:
-                leng = self.embed_l(obs[:, self.input_obs:self.input_obs + self.input_l])
-            except RuntimeError:
-                pdb.set_trace()
+            leng = self.embed_l(obs[:, self.input_obs:self.input_obs + self.input_l])
             x = x + leng
         policy_latent = self.latent_policy(x)
         mu = self.mu(policy_latent)

@@ -31,7 +31,7 @@ class hyper_params:
         self.discount = args.discount
         self.delta_length = args.delta_length
         self.delta_skill = args.delta_skill
-        self.test_freq = args.test_freq
+        self.checkpoint_freq = args.checkpoint_freq
         self.buffer_size = int(args.buffer_size)
         self.critic_warmup = args.critic_warmup
         self.max_iterations = args.max_iterations

@@ -237,12 +237,9 @@ class HIVES(hyper_params):
     def skill_prior_loss(self, idx, obs, params, i):
         """Compute loss for skill prior."""
         if self.length_dim is not None:
-            try:
-                probs = functional_call(self.models['LengthPrior'],
-                                        params['LengthPrior'],
-                                        obs)
-            except TypeError:
-                pdb.set_trace()
+            probs = functional_call(self.models['LengthPrior'],
+                                    params['LengthPrior'],
+                                    obs)
 
             samples = torch.argmax(probs, dim=1)
             samples_oh = F.one_hot(samples, num_classes=len(self.hrchy))

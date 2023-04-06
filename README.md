@@ -20,7 +20,7 @@ pip install -r requirements.txt
 
 To train the all models from scratch with default hyperparameters
 
-> Training all models simultaneously can have very large RAM memory consumption, especially for large offline datasets. For this reason, we recommend first to train the VAE model, then the priors, and finally the RL models.
+> Training all models at once can have very large RAM memory consumption, especially for large offline datasets. For this reason, we recommend first to train the VAE model, then the priors, and finally the RL models.
 
 ```main
 python main.py --env_id ENV_ID --foldername FOLDERNAME
@@ -48,7 +48,7 @@ There are other 3 important arguments. Those are:
 As another example
 
 ```main
-python main.py --env_id kitchen-mixed-v0 --no-train_VAE --no-train_priors --no-train_rl --load_VAE_models --load_priors_models --load_rl_models --params_path checkpoints/kitchen/params_kitchen.pt --render-results
+python main.py --env_id kitchen-mixed-v0 --no-train_VAE --no-train_priors --no-train_rl --load_VAE_models --load_priors_models --load_rl_models --params_path checkpoints/kitchen/params_kitchen.pt --render_results
 ```
 
 This command would render a video and skill frames for the kitchen environment. All arguments have a default value, which can be seen in `main.py`. If the intended value for an argument is the same as the default, then there is no need to pass the argument, e.g., `--case` has default value `0`, which was not pass because that is the intended value.
@@ -92,7 +92,7 @@ Additional hyperparemeters that can be modified are:
 - `--max_iterations` Max number of gradient updates (not environments steps).
 - `--buffer_size` Size of the buffer containing the replay experience.
 - `--critic_warmup` Number of gradient updates before the policies start being trained.
-- `--test_freq` Frequency with which the metrics of the training are loaded to wandb.
+- `--checkpoint_freq` Frequency with which models are saved during RL training.
 
 
 This implementation can be easily used with other environments in the D4RL library simply by changing `--env_id`. To use it with external environments, the offline dataset must be provided and loaded, which requires minor modifications to the code. 

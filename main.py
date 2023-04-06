@@ -171,7 +171,7 @@ if __name__ == "__main__":
     parser.add_argument('--max_iterations', type=int, default=4e5, help='Max number of gradient updates')
     parser.add_argument('--buffer_size', type=int, default=4e5, help='Size of experience replay buffer')
     parser.add_argument('--critic_warmup', type=int, default=512, help='Number of iterations before training policies')
-    parser.add_argument('--test_freq', type=int, default=100000, help='Frequency to save models')
+    parser.add_argument('--checkpoint_freq', type=int, default=100000, help='Frequency to save models')
     args = parser.parse_args()
 
     if torch.cuda.is_available():

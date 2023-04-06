@@ -79,7 +79,7 @@ class MLSP(hyper_params):
                                                         obs=obs,
                                                         critic_warmup=critic_warmup)
 
-            if self.iterations % self.test_freq == 0 and self.iterations > 0:
+            if self.iterations % self.checkpoint_freq == 0 and self.iterations > 0:
                 dt_string = datetime.now().strftime("%d-%m-%Y-%H:%M:%S")
                 print(f'Current iteration is {self.iterations}')
                 print(dt_string)
@@ -411,16 +411,13 @@ class MLSP(hyper_params):
 
         return rew_kl_len
         
-
     def get_gradient(self, x, params, key):
         grads = autograd.grad(x, params[key].values(), retain_graph=True,
                               allow_unused=True)
 
-        grads = [grad for grad in grads if grad is not None]
-        try:
-            grads_vec = nn.utils.parameters_to_vector(grads)
-        except RuntimeError:
-            pdb.set_trace()
+        grads = [grad for grad in grads if grad is not None]        
+        grads_vec = nn.utils.parameters_to_vector(grads)
+
         return torch.norm(grads_vec).detach().cpu()
 
     def distance_to_params(self, params1, params2, name1, name2):
