@@ -25,20 +25,20 @@ python main.py --env_id ENV_ID --foldername FOLDERNAME
 
 There are other possible options for training. Those are given by the following boolean arguments
 
-- '--train_VAE_models' This argument determines whether to learn the embedding space for the skills.
+- `--train_VAE_models` This argument determines whether to learn the embedding space for the skills.
      > Because all models use the same embedding space, it is recommended the VAE models are learned once,
 	 and then are loaded for all subsequent experiments. 
-- '--train_priors' This argument determines whether to learn the length and skill priors.
-- '--train_rl' This argument determines whether to train the rl models (length policy, skill policy, and critics).
-- '--load_VAE_models' If no VAE models are trained, then this must be set to `True`.
-- '--load_prior_models' This argument determines whether to load pretrained priors models.
-- '--load_rl_models' This argument determines whether to load pretrained rl models.
-- '--use_SAC' If set to `True`, then the prior models are ignored, and the algorithm executed is SAC with multi-length skills.
+- `--train_priors` This argument determines whether to learn the length and skill priors.
+- `--train_rl` This argument determines whether to train the rl models (length policy, skill policy, and critics).
+- `--load_VAE_models` If no VAE models are trained, then this must be set to `True`.
+- `--load_prior_models` This argument determines whether to load pretrained priors models.
+- `--load_rl_models` This argument determines whether to load pretrained rl models.
+- `--use_SAC` If set to `True`, then the prior models are ignored, and the algorithm executed is SAC with multi-length skills.
 
 There are other 3 important arguments. Those are:
 
 - `--case` This set what lengths are to be used. The value required is 0 which runs 3 lengths: 4, 16, and 64. To train the models with other lengths, we refer the reader to the TODO
-- '--single_length' If `None`, then the MLSP is run. If a value is passed, then SPiRL is implemented with that given length.
+- `--single_length` If `None`, then the MLSP is run. If a value is passed, then SPiRL is implemented with that given length.
      > Note that the length passed here has to be a valid length, that is, it must be 4, 16, or 64.
 - `--render_results` If set to `True`, then the program will create a video with the policy being executed. Additionally, it saves the resulting frame after the skill execution.
 
@@ -72,15 +72,15 @@ Additional hyperparemeters that can be modified are:
 - `--beta` Regularization parameter for the ELBO loss of the VAE model.
 
 ### Online hyperparameters
--- `--online_batch_size` Batch size for gradient updates.
--- `--action_range` Sets a range for the skill policy, i.e., the output is within this range. If 4, then the range is [-4, 4]
--- `--discount` Discount factor used in RL.
--- `--delta_length` Value for target divergence for the lengths.
--- `--delta_skill` Value for target divergence for the skills.
--- `--max_iterations` Max number of gradient updates (not environments steps).
--- `--buffer_size` Size of the buffer containing the replay experience.
--- `--critic_warmup` Number of gradient updates before the policies start being trained.
--- `--test_freq` Frequency with which the metrics of the training are loaded to wandb.
+- `--online_batch_size` Batch size for gradient updates.
+- `--action_range` Sets a range for the skill policy, i.e., the output is within this range. If 4, then the range is [-4, 4].
+- `--discount` Discount factor used in RL.
+- `--delta_length` Value for target divergence for the lengths.
+- `--delta_skill` Value for target divergence for the skills.
+- `--max_iterations` Max number of gradient updates (not environments steps).
+- `--buffer_size` Size of the buffer containing the replay experience.
+- `--critic_warmup` Number of gradient updates before the policies start being trained.
+- `--test_freq` Frequency with which the metrics of the training are loaded to wandb.
 
 
 This implementation can be easily used with other environments in the D4RL library simply by changing `--env_id`. To use it with external environments, the offline dataset must be provided and loaded, which requires minor modifications to the code. 
