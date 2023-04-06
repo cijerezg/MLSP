@@ -1,6 +1,7 @@
-# My Paper Title
+# Multi-length Skills with Priors for Reinforcement Learning
 
-This repository is the official implementation of Multi-Length Skills with Prior for Reinforcement Learning
+This repository is the official implementation of Multi-Length Skills with Prior for Reinforcement Learning.  
+
 Neural Information Processing Systems / NeurIPS 2023
 
 > We present MLSP, an approach to transfer multi-length skills from offline datasets to accelerate downstream learning of unseen tasks. We propose HIMES, 
@@ -19,13 +20,15 @@ pip install -r requirements.txt
 
 To train the all models from scratch with default hyperparameters
 
+> Training all models simultaneously can have very large RAM memory consumption, especially for large offline datasets. For this reason, we recommend first to train the VAE model, then the priors, and finally the RL models.
+
 ```main
 python main.py --env_id ENV_ID --foldername FOLDERNAME
 ```
 
 There are other possible options for training. Those are given by the following boolean arguments
 
-- `--train_VAE_models` This argument determines whether to learn the embedding space for the skills.
+- `--train_VAE` This argument determines whether to learn the embedding space for the skills.
      > Because all models use the same embedding space, it is recommended the VAE models are learned once,
 	 and then are loaded for all subsequent experiments. 
 - `--train_priors` This argument determines whether to learn the length and skill priors.
@@ -41,6 +44,15 @@ There are other 3 important arguments. Those are:
 - `--single_length` If `None`, then the MLSP is run. If a value is passed, then SPiRL is implemented with that given length.
      > Note that the length passed here has to be a valid length, that is, it must be 4, 16, or 64.
 - `--render_results` If set to `True`, then the program will create a video with the policy being executed. Additionally, it saves the resulting frame after the skill execution.
+
+As another example
+
+```main
+python main.py --env_id kitchen-mixed-v0 --no-train_VAE --no-train_priors --no-train_rl --load_VAE_models --load_priors_models --load_rl_models --params_path checkpoints/kitchen/params_kitchen.pt --render-results
+```
+
+This command would render a video and skill frames for the kitchen environment. All arguments have a default value, which can be seen in `main.py`. If the intended value for an argument is the same as the default, then there is no need to pass the argument, e.g., `--case` has default value `0`, which was not pass because that is the intended value.
+
 
 For all other hyperparmeters we refer the readers to the Further Details section.
 
