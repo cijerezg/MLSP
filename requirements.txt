@@ -1,4 +1,4 @@
-D4RL==1.1
+d4rl==1.1
 gym==0.21.0
 numpy==1.23.5
 scikit_video==1.1.11

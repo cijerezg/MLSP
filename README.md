@@ -44,11 +44,12 @@ There are other 3 important arguments. Those are:
 - `--single_length` If `None`, then the MLSP is run. If a value is passed, then SPiRL is implemented with that given length.
      > Note that the length passed here has to be a valid length, that is, it must be 4, 16, or 64.
 - `--render_results` If set to `True`, then the program will create a video with the policy being executed. Additionally, it saves the resulting frame after the skill execution.
+     > To be able to render the video, you need to have OpenGL.
 
 As another example
 
 ```main
-python main.py --env_id kitchen-mixed-v0 --no-train_VAE --no-train_priors --no-train_rl --load_VAE_models --load_priors_models --load_rl_models --params_path checkpoints/kitchen/params_kitchen.pt --render_results
+python main.py --env_id kitchen-mixed-v0 --no-train_VAE --no-train_priors --no-train_rl --load_VAE_models --load_prior_models --load_rl_models --params_path checkpoints/kitchen/params_kitchen.pt --render_results
 ```
 
 This command would render a video and skill frames for the kitchen environment. All arguments have a default value, which can be seen in `main.py`. If the intended value for an argument is the same as the default, then there is no need to pass the argument, e.g., `--case` has default value `0`, which was not pass because that is the intended value.
@@ -102,7 +103,7 @@ This implementation can be easily used with other environments in the D4RL libra
 There are four modules to our implementation.
 
 - `models` In this module, the neural network architectures are defined.
-- `utilities` As the name suggests, it contain various useful functions. The most notable one is that the hyperparameters are passed to the `hyper_arams` class inside `utils.py`. To try different lengths, go to the function `vae_hrchy_config` and modify it there directly.
+- `utilities` As the name suggests, it contain various useful functions. The most notable one is that the hyperparameters are passed to the `hyper_params` class inside `utils.py`. To try different lengths, go to the function `vae_hrchy_config` and modify it there directly.
 - `offline` This module sets the training of the offline models.
 - `rl` This module sets the training of online models. It contains two scripts. `sampler.py`, which runs the policies on the environment and prepares the data, and `agent.py` which uses the data to compute the losses and apply the gradients to update the online models.
 
