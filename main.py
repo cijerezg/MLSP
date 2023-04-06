@@ -95,7 +95,6 @@ def main(config=None):
                 for e in range(config.epochs):
                     params = hives.train_vae_level(params,
                                                    optimizers,
-                                                   config.vae_lr,
                                                    config.beta,
                                                    j)
                     if j == len(hives.hrchy) - 1 and e % test_freq == 0:
@@ -106,18 +105,17 @@ def main(config=None):
             fullpath = f'{path}/{folder}'
             if not os.path.exists(fullpath):
                 os.makedirs(fullpath)
+            torch.save(params, f'{path}/{folder}/params_{dt_string}_offline.pt')
                 
         if config.train_priors:
             hives.set_skill_lookup(len(hives.hrchy), params)
-
+            
             if hives.length_dim is not None:
                 for i in range(config.epochs):
-                    params = hives.train_prior(params, optimizers,
-                                               config.priors_lr)
+                    params = hives.train_prior(params, optimizers)
                 
             for i in range(config.epochs):
                 params = hives.train_prior(params, optimizers,
-                                           config.priors_lr,
                                            length=False)
 
             if config.single_length is not None:
@@ -151,7 +149,7 @@ if __name__ == "__main__":
     parser.add_argument('--load_VAE_models', action=argparse.BooleanOptionalAction, default=True)
     parser.add_argument('--load_prior_models', action=argparse.BooleanOptionalAction, default=True)
     parser.add_argument('--load_rl_models', action=argparse.BooleanOptionalAction, default=False)
-    parser.add_argument('--params_path', type=str, default='checkpoints/params-relocate-cloned-v1.pt')
+    parser.add_argument('--params_path', type=str, default='checkpoints/relocate/params_relocate.pt')
 
     parser.add_argument('--lr', type=float, default=3e-4, help='Learning rate')
     parser.add_argument('--alpha_lr', type=float, default=3e-4, help='Learning rate for alpha updates')
@@ -173,7 +171,7 @@ if __name__ == "__main__":
     parser.add_argument('--max_iterations', type=int, default=4e5, help='Max number of gradient updates')
     parser.add_argument('--buffer_size', type=int, default=4e5, help='Size of experience replay buffer')
     parser.add_argument('--critic_warmup', type=int, default=512, help='Number of iterations before training policies')
-    parser.add_argument('--test_freq', type=int, default=1000, help='Frequency to upload training metrics to wandb')
+    parser.add_argument('--test_freq', type=int, default=100000, help='Frequency to save models')
     args = parser.parse_args()
 
     if torch.cuda.is_available():

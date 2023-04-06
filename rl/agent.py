@@ -75,7 +75,6 @@ class MLSP(hyper_params):
 
             params, obs, done = self.training_iteration(params, done,
                                                         optimizers,
-                                                        self.actor_lr,
                                                         ref_params,
                                                         obs=obs,
                                                         critic_warmup=critic_warmup)
@@ -100,7 +99,6 @@ class MLSP(hyper_params):
                            params,
                            done,
                            optimizers,
-                           lr,
                            ref_params,
                            obs=None,
                            critic_warmup=False):
@@ -139,11 +137,11 @@ class MLSP(hyper_params):
 
         policy_names = ['SkillPolicy'] if self.length_dim is None else ['SkillPolicy', 'LengthPolicy']
 
-        if self.experience_buffer.size > self.batch_size:
+        if self.experience_buffer.size > self.online_batch_size:
             policy_losses, critic1_loss, critic2_loss = self.losses(params, log_data)           
             losses = [critic1_loss, critic2_loss] if critic_warmup else [*policy_losses, critic1_loss, critic2_loss]
             names = ['Critic1', 'Critic2'] if critic_warmup else [*policy_names, 'Critic1', 'Critic2']
-            params = Adam_update(params, losses, names, optimizers, lr)
+            params = Adam_update(params, losses, names, optimizers)
             polyak_update(params['Critic1'].values(),
                           params['Target_critic1'].values(), 0.005)
             polyak_update(params['Critic2'].values(),
@@ -166,7 +164,7 @@ class MLSP(hyper_params):
         return params, next_obs, done
 
     def losses(self, params, log_data):
-        batch = self.experience_buffer.sample(batch_size=self.batch_size)
+        batch = self.experience_buffer.sample(batch_size=self.online_batch_size)
 
         obs = torch.from_numpy(batch.observations).to(self.device)
         next_obs = torch.from_numpy(batch.next_observations).to(self.device)
@@ -180,7 +178,7 @@ class MLSP(hyper_params):
         z_prior_arg = torch.cat([obs, length], dim=1)
 
         with torch.no_grad():
-            if self.length_dim is not None and self.use_length_prior:
+            if self.length_dim is not None:
                 l_prior = self.eval_length_prior(obs, params)
                                 
             z_prior = self.eval_skill_prior(z_prior_arg, params)
@@ -311,10 +309,7 @@ class MLSP(hyper_params):
         skill_policy_loss = q_val_policy + skill_prior_loss
             
         if self.length_dim is not None:
-            if self.use_length_prior:
-                length_policy_loss = q_val_policy_l + length_prior_loss
-            else:
-                length_policy_loss = q_val_policy_l
+            length_policy_loss = q_val_policy_l + length_prior_loss
             policy_losses = [skill_policy_loss, length_policy_loss]
         else:
             policy_losses = [skill_policy_loss]
@@ -362,7 +357,7 @@ class MLSP(hyper_params):
                  'Critic/Q2': wandb.Histogram(q2.detach().cpu()),
                  'Critic/Target values w reward': wandb.Histogram(q_target.cpu())})
 
-            wandb.log({'Reward Percentage': sum(rew > 0.0) / self.batch_size})
+            wandb.log({'Reward Percentage': sum(rew > 0.0) / self.online_batch_size})
         
         return policy_losses, critic1_loss, critic2_loss
 

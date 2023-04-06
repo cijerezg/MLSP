@@ -18,6 +18,7 @@ from models.nns import Encoder, Decoder
 import wandb
 import gym
 import d4rl
+import pdb
 
 class HIVES(hyper_params):
     """Define all offline and train all offline models."""
@@ -59,16 +60,16 @@ class HIVES(hyper_params):
 
         self.names.extend(['SkillPrior'])
 
-    def dataset_loader(self, path):
+    def dataset_loader(self):
         """Dataset is one single file."""
-        self.load_dataset(path)
+        self.load_dataset()
         
         dset_train = Drivedata(self.indexes)
 
         self.loader = DataLoader(dset_train, shuffle=True, num_workers=8,
-                                 batch_size=self.vae_batch_size)
+                                 batch_size=self.offline_batch_size)
 
-    def train_vae_level(self, params, optimizers, lr, beta, level):
+    def train_vae_level(self, params, optimizers, beta, level):
         """Train a particular encoder and decoder level.
 
         It may use previous levels, but those parameters are not
@@ -82,7 +83,7 @@ class HIVES(hyper_params):
             m = self.level_lengths[level]
             losses = [loss]
             params_names = [f'Level{m}']
-            params = Adam_update(params, losses, params_names, optimizers, lr)
+            params = Adam_update(params, losses, params_names, optimizers)
 
         wandb.log({'VAE/loss': recon_loss.detach().cpu()})
         wandb.log({'VAE/kl_loss': kl_loss.detach().cpu()})
@@ -97,7 +98,6 @@ class HIVES(hyper_params):
         error = torch.square(action - rec).mean(1)
         rec_loss = -Normal(rec, 1).log_prob(action).sum(axis=-1)
         rec_loss = rec_loss.mean()
-        # rec_loss = F.mse_loss(action, rec)
 
         if i == 0:
             wandb.log({'VAE/[encoder] STD':
@@ -175,19 +175,6 @@ class HIVES(hyper_params):
                 self.loc[j * bs_size: (j + 1) * bs_size, i, :] = loc
                 self.scale[j * bs_size: (j + 1) * bs_size, i, :] = scale
 
-        # idx = np.random.randint(0, self.weights.shape[0]-1, 5000)
-        # data = self.weights[idx, :].detach().cpu().numpy()
-        # df = pd.DataFrame()
-        # df['0'] = data[:, 0]
-        # df['1'] = data[:, 1]
-        # df['2'] = data[:, 2]
-        # df['3'] = data[:, 3]
-        # pdb.set_trace()
-        # g = sns.pairplot(df, diag_kind='kde')
-
-        # g.map_lower(sns.kdeplot, levels=4, color=".2")
-        # plt.show()
-
         vecs = [val for val in self.level_lengths.values()]  # Get all the lengths, e.g., 8, 32, 64
         vecs = torch.tensor(vecs).to(self.device)
         self.vecs = vecs.reshape(1, -1)
@@ -203,7 +190,7 @@ class HIVES(hyper_params):
         x = x.reshape(-1, self.skill_length // lev_len, x.shape[-1])
         return x[:, 0, :]
         
-    def train_prior(self, params, optimizers, lr, length=True):
+    def train_prior(self, params, optimizers, length=True):
         """Trains one epoch of length prior."""
         for i, idx in enumerate(self.loader):
             obs = self.dataset['observations'][idx][:, 0, :]
@@ -214,7 +201,7 @@ class HIVES(hyper_params):
                 prior_loss = self.skill_prior_loss(idx, obs, params, i)
             name = ['LengthPrior'] if length else ['SkillPrior']
             loss = [prior_loss]
-            params = Adam_update(params, loss, name, optimizers, lr)
+            params = Adam_update(params, loss, name, optimizers)
 
         return params
     
@@ -250,9 +237,12 @@ class HIVES(hyper_params):
     def skill_prior_loss(self, idx, obs, params, i):
         """Compute loss for skill prior."""
         if self.length_dim is not None:
-            probs = functional_call(self.models['LengthPrior'],
-                                    params['LengthPrior'],
-                                    obs)
+            try:
+                probs = functional_call(self.models['LengthPrior'],
+                                        params['LengthPrior'],
+                                        obs)
+            except TypeError:
+                pdb.set_trace()
 
             samples = torch.argmax(probs, dim=1)
             samples_oh = F.one_hot(samples, num_classes=len(self.hrchy))

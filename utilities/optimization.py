@@ -135,7 +135,7 @@ def Adam_update(params: list[dict],
                 losses: list[float],
                 keys: list[str],
                 optimizers: list,
-                lr: float):
+                ):
 
     for loss, key in zip(losses, keys):
         optimizers[key].zero_grad()
