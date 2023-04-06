@@ -1,0 +1,7 @@
+D4RL==1.1
+gym==0.21.0
+numpy==1.23.5
+scikit_video==1.1.11
+stable_baselines3==1.7.0
+torch==2.0.0
+wandb==0.13.5
