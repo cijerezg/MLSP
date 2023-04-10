@@ -110,3 +110,6 @@ There are four modules to our implementation.
 
 One key difference of our implementation from other implementations of RL algorithms is that we use [functional_call](https://pytorch.org/docs/stable/generated/torch.func.functional_call.html#torch.func.functional_call) to evaluate the neural networks. The functional call requires to pass two inputs: the value to be mapped (aka the traditional input) and the weights of the neural network. This is why we store the parameters of all models in a dictionary and query the appropriate model parameters when needed.
 
+
+## Troubleshooting
+
