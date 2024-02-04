@@ -2,8 +2,6 @@
 
 This repository is the official implementation of Multi-Length Skills with Prior for Reinforcement Learning.  
 
-Neural Information Processing Systems / NeurIPS 2023
-
 > We present MLSP, an approach to transfer multi-length skills from offline datasets to accelerate downstream learning of unseen tasks. We propose HIMES, 
 a deep latent variable model that learns an embedding space of multi-length skills, and two priors, one over lengths, whose notion of optimal length is 
 based on the reconstruction error of skills, and the other one over skills. We then extend RL algorithms to the multi-length case, which entails 
